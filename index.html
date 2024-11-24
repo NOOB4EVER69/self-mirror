@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self Mirror</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            transition: background 1s, color 1s;
+            text-align: center;
+        }
+        header {
+            background: #0f3460;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.5em;
+            animation: flicker 2s infinite;
+        }
+        main {
+            flex: 1;
+            padding: 10px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .question p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        button {
+            background: #53354a;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        button.enabled {
+            opacity: 1;
+            cursor: pointer;
+        }
+        button:disabled {
+            cursor: not-allowed;
+        }
+        .hidden {
+            display: none;
+        }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .glitch {
+            animation: glitch 0.2s infinite;
+        }
+        .warning {
+            display: none;
+            background: #000000;
+            color: #e0e0e0;
+            padding: 20px;
+            text-align: center;
+        }
+        .fade {
+            animation: fade-in 1s forwards;
+        }
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Self Mirror</h1>
+    </header>
+    <main>
+        <div id="questions">
+            <!-- Questions will be dynamically injected here -->
+        </div>
+        <button id="next-button" disabled onclick="nextQuestion()">Next</button>
+        <button class="hidden" id="finish-button" onclick="showWarning()">Finish</button>
+    </main>
+    <div id="warning" class="warning">
+        <h2 class="glitch">You Can’t Hide...</h2>
+        <p>No one can run from themselves.</p>
+    </div>
+<script>
+        const questionsList = [
+            "Why are you never enough for yourself?",
+            "What’s the worst thing you’ve ever done that you’ll never admit to anyone?",
+            "Why do you push people away when they care about you?",
+            "Do you ever feel like you’ll die alone?",
+            "What do you hate most about yourself?",
+            "Why do you think no one truly understands you?",
+            "What’s a moment you can’t forgive yourself for?",
+            "Why do you replay conversations in your head, over and over?",
+            "Do you think anyone would miss you if you were gone?",
+            "Why are you so afraid of being vulnerable?",
+            "What’s something you’ve done that still haunts you?",
+            "Why are you so obsessed with how others see you?",
+            "What’s one thing you’re pretending not to feel right now?",
+            "Do you feel like you deserve love?",
+            "Why can’t you let go of the past?",
+            "Why are you so scared to look in the mirror?",
+            "What do you think people would say at your funeral?",
+            "Why do you lie to the people you care about most?",
+            "Do you think you’ll ever be happy?",
+            "What do you regret saying to someone who isn’t around anymore?",
+            "Why do you act like everything is fine when it’s not?",
+            "What would you say to your younger self if you could?",
+            "Why do you feel like you have to prove your worth to everyone?",
+            "What scares you most about being forgotten?",
+            "Why can’t you forgive yourself for mistakes you’ve made?",
+            "What do you think would happen if everyone knew the real you?",
+            "What’s the most painful truth you’ve tried to ignore?",
+            "Why do you feel so empty, even when you’re surrounded by people?",
+            "What’s something you know you’ll regret forever?",
+            "Why do you feel like you can’t be fixed?",
+            "Do you think people secretly talk about you behind your back?",
+            "Why does your heart race when you’re alone in a silent room?",
+            "What’s something you’ve been avoiding confronting about yourself?",
+            "Do you ever feel like you’re an impostor in your own life?",
+            "What’s a fear you wish you didn’t have?",
+            "Why does it feel like everyone else is moving forward but you?",
+            "Do you ever feel like you’re just pretending to be okay?",
+            "What’s a truth about yourself you’re too scared to face?",
+            "Why do you feel like you have to hide who you are?",
+            "What’s a memory you wish you could erase?",
+            "Why do you second-guess every decision you make?",
+            "What’s something you wish someone would ask you, but they never do?",
+            "Why do you find it so hard to trust others?",
+            "What’s the last time you truly felt safe?",
+            "Why does it feel like no one is really listening to you?",
+            "Do you feel like people are only nice to you out of pity?",
+            "What’s a feeling you can’t put into words?",
+            "Why do you feel the need to apologize for existing?",
+            "What’s the scariest thought you’ve had about yourself?",
+            "Why do you feel so exhausted all the time?",
+            "Do you think people would still like you if they saw the real you?",
+            "What’s something you’ve buried so deep you forgot it existed?",
+            "Why do you feel like you can’t breathe sometimes?",
+            "What’s a question you’re too afraid to ask yourself?",
+            "Why does your mind never stop racing?",
+            "Why do you feel like you’re running out of time?",
+            "What’s something you’re scared will never change?",
+            "Why do you feel like no one really knows you?",
+            "What’s the last time you were truly honest with yourself?",
+            "Why do you feel so trapped inside your own mind?"
+        ];
+
+        let questionIndex = 0;
+        const questionsContainer = document.getElementById("questions");
+        const nextButton = document.getElementById("next-button");
+        const finishButton = document.getElementById("finish-button");
+        const warning = document.getElementById("warning");
+
+        function injectQuestions() {
+            questionsList.forEach((question, index) => {
+                const questionDiv = document.createElement("div");
+                questionDiv.className = "question hidden";
+                if (index === 0) questionDiv.classList.remove("hidden"); // First question visible
+
+                questionDiv.innerHTML = `
+                    <p>${question}</p>
+                    <input type="text" oninput="enableNext()">
+                `;
+                questionsContainer.appendChild(questionDiv);
+            });
+        }
+
+        function enableNext() {
+            const currentQuestion = questionsContainer.children[questionIndex];
+            const input = currentQuestion.querySelector("input");
+            if (input && input.value.trim() !== "") {
+                nextButton.disabled = false;
+                nextButton.classList.add("enabled");
+            } else {
+                nextButton.disabled = true;
+                nextButton.classList.remove("enabled");
+            }
+        }
+
+        function nextQuestion() {
+            const currentQuestion = questionsContainer.children[questionIndex];
+            currentQuestion.classList.add("hidden");
+
+            if (questionIndex < questionsList.length - 1) {
+                questionIndex++;
+                const nextQuestion = questionsContainer.children[questionIndex];
+                nextQuestion.classList.remove("hidden");
+                nextQuestion.classList.add("fade");
+                updateAtmosphere();
+                nextButton.disabled = true;
+                nextButton.classList.remove("enabled");
+            }
+
+            if (questionIndex === questionsList.length - 1) {
+                nextButton.style.display = "none";
+                finishButton.classList.remove("hidden");
+            }
+        }
+
+        function updateAtmosphere() {
+            if (questionIndex === 15) {
+                document.body.style.background = "#111111";
+            } else if (questionIndex === 20) {
+document.querySelector("header h1").innerText = "Do You Know Yourself?";
+            
+                document.body.style.color = "#ff4d4d";
+            }
+        }
+
+        function showWarning() {
+            warning.style.display = "block";
+        }
+
+        injectQuestions();
+    </script>
+</body>
+</html>
